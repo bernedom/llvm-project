@@ -108,6 +108,11 @@ Improvements to clang-tidy
   Checks whether there are underscores in googletest test and test case names in
   test macros, which is prohibited by the Googletest FAQ.
 
+- New :doc:`misc-auto-to-explicit-return-type
+  <clang-tidy/checks/misc-auto-to-explicit-return-type>` check.
+
+  FIXME: add release notes.
+
 - New :doc:`objc-super-self <clang-tidy/checks/objc-super-self>` check.
 
   Finds invocations of ``-self`` on super instances in initializers of
