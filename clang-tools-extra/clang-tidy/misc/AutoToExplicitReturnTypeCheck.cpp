@@ -17,20 +17,23 @@ namespace tidy {
 namespace misc {
 
 void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
-  // FIXME: Add matchers.
-  Finder->addMatcher(functionDecl().bind("x"), this);
+  Finder->addMatcher(
+      functionDecl(isConstexpr(), unless(isImplicit())).bind("x"), this);
+  // Finder->addMatcher(userDefinedLiteral().bind("x"), this);
 }
 
 void AutoToExplicitReturnTypeCheck::check(
     const MatchFinder::MatchResult &Result) {
   // FIXME: Add callback implementation.
   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("x");
-  if (MatchedDecl->getName().startswith("awesome_"))
-    return;
-  diag(MatchedDecl->getLocation(), "function %0 is insufficiently awesome")
+  // if (!MatchedDecl->getName().startswith("operator\"\""))
+  //   return;
+  diag(MatchedDecl->getLocation(),
+       "operator %0 is returning auto instead of explict return type")
       << MatchedDecl;
-  diag(MatchedDecl->getLocation(), "insert 'awesome'", DiagnosticIDs::Note)
-      << FixItHint::CreateInsertion(MatchedDecl->getLocation(), "awesome_");
+  diag(MatchedDecl->getLocation(), "replace with return type XYZ",
+       DiagnosticIDs::Note)
+      << FixItHint::CreateInsertion(MatchedDecl->getLocation(), "XYZ");
 }
 
 } // namespace misc
