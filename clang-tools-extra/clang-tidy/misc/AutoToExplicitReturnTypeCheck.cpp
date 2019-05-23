@@ -21,7 +21,8 @@ void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
   Finder->addMatcher(functionDecl().bind("x"), this);
 }
 
-void AutoToExplicitReturnTypeCheck::check(const MatchFinder::MatchResult &Result) {
+void AutoToExplicitReturnTypeCheck::check(
+    const MatchFinder::MatchResult &Result) {
   // FIXME: Add callback implementation.
   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("x");
   if (MatchedDecl->getName().startswith("awesome_"))

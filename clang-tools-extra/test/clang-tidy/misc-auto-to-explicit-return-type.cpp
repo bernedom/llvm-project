@@ -1,7 +1,16 @@
 // RUN: %check_clang_tidy %s misc-auto-to-explicit-return-type %t
 
+template <typename T, typename U>
+struct root_class {
+};
+
+template <typename U>
+using typed_class = root_class<int, U>;
+
 // FIXME: Add something that triggers the check here.
-void f();
+auto operator"" _some(long double) {
+  return typed_class<long double>{};
+}
 // CHECK-MESSAGES: :[[@LINE-1]]:6: warning: function 'f' is insufficiently awesome [misc-auto-to-explicit-return-type]
 
 // FIXME: Verify the applied fix.
@@ -11,4 +20,6 @@ void f();
 // CHECK-FIXES: {{^}}void awesome_f();{{$}}
 
 // FIXME: Add something that doesn't trigger the check here.
-void awesome_f2();
+typed_class<long double> operator"" _some_more(long double) {
+  return typed_class<long double>{};
+};
