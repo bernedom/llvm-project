@@ -7,6 +7,11 @@ struct base_class {
 template <typename U>
 using typed_class = base_class<int, U>;
 
+constexpr auto operator"" _intr(long double) {
+  int x = 0;
+  return x;
+}
+
 // FIXME: Add something that triggers the check here.
 constexpr auto operator"" _some(long double) {
   return typed_class<long double>{};

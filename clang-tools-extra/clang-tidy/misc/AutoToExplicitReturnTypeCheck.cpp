@@ -18,7 +18,9 @@ namespace misc {
 
 void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
   Finder->addMatcher(
-      functionDecl(isConstexpr(), unless(isImplicit())).bind("x"), this);
+      functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()))
+          .bind("x"),
+      this);
   // Finder->addMatcher(userDefinedLiteral().bind("x"), this);
 }
 
@@ -29,11 +31,13 @@ void AutoToExplicitReturnTypeCheck::check(
   // if (!MatchedDecl->getName().startswith("operator\"\""))
   //   return;
   diag(MatchedDecl->getLocation(),
-       "operator %0 is returning auto instead of explict return type")
-      << MatchedDecl;
-  diag(MatchedDecl->getLocation(), "replace with return type XYZ",
+       "operator %0 is returning 'auto' instead of explict return type '%1'")
+      << MatchedDecl << MatchedDecl->getReturnType().getAsString();
+  diag(MatchedDecl->getLocation(), "replace with return type %0",
        DiagnosticIDs::Note)
-      << FixItHint::CreateInsertion(MatchedDecl->getLocation(), "XYZ");
+      << FixItHint::CreateInsertion(MatchedDecl->getLocation(),
+                                    MatchedDecl->getReturnType().getAsString())
+      << MatchedDecl->getReturnType().getAsString();
 }
 
 } // namespace misc
