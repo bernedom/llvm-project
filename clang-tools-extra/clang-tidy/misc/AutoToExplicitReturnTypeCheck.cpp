@@ -31,9 +31,9 @@ void AutoToExplicitReturnTypeCheck::check(
   // if (!MatchedDecl->getName().startswith("operator\"\""))
   //   return;
   diag(MatchedDecl->getLocation(),
-       "operator %0 is returning 'auto' instead of explict return type '%1'")
+       "function %0 returns 'auto' instead of explict return type '%1'")
       << MatchedDecl << MatchedDecl->getReturnType().getAsString();
-  diag(MatchedDecl->getLocation(), "replace with return type %0",
+  diag(MatchedDecl->getLocation(), "replace with return type '%0'",
        DiagnosticIDs::Note)
       << FixItHint::CreateInsertion(MatchedDecl->getLocation(),
                                     MatchedDecl->getReturnType().getAsString())

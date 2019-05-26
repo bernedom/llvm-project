@@ -1,4 +1,4 @@
-// RUN: %check_clang_tidy %s misc-auto-to-explicit-return-type %t
+// RUN: %check_clang_tidy %s misc-auto-to-explicit-return-type %t -- -- -std=c++17
 
 template <typename T, typename U>
 struct base_class {
@@ -11,22 +11,18 @@ constexpr auto operator"" _intr(long double) {
   int x = 0;
   return x;
 }
+// CHECK-MESSAGES: :[[@LINE-3]]:1: warning: function '_intr' returns 'auto' instead of explicit return type 'int' [misc-auto-to-explicit-return-type]
+// CHECK-FIXES: {{^}}replace with return type 'int'{{$}}
 
-// FIXME: Add something that triggers the check here.
 constexpr auto operator"" _some(long double) {
   return typed_class<long double>{};
 }
-// CHECK-MESSAGES: :[[@LINE-3]]:1: warning: operator '_some' returns auto instead of explicit return type [misc-auto-to-explicit-return-type]
+// CHECK-MESSAGES: :[[@LINE-3]]:1: warning: operator '_some' returns 'auto' instead of explicit return type 'typed_class<long double>' [misc-auto-to-explicit-return-type]
+// CHECK-FIXES: {{^}}replace with return type 'typed_class<long double>'{{$}}
 
-// FIXME: Verify the applied fix.
-//   * Make the CHECK patterns specific enough and try to make verified lines
-//     unique to avoid incorrect matches.
-//   * Use {{}} for regular expressions.
-// CHECK-FIXES: {{^}}void awesome_f();{{$}}
-
-void any_f(){};
-
-// FIXME: Add something that doesn't trigger the check here.
+// does not trigger
 constexpr typed_class<long double> operator"" _some_more(long double) {
   return typed_class<long double>{};
 };
+
+void any_f(){};
