@@ -30,13 +30,14 @@ void AutoToExplicitReturnTypeCheck::check(
   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("x");
   // if (!MatchedDecl->getName().startswith("operator\"\""))
   //   return;
-  diag(MatchedDecl->getLocation(),
+  diag(MatchedDecl->getReturnTypeSourceRange().getBegin(),
        "function %0 returns 'auto' instead of explict return type '%1'")
       << MatchedDecl << MatchedDecl->getReturnType().getAsString();
-  diag(MatchedDecl->getLocation(), "replace with return type '%0'",
-       DiagnosticIDs::Note)
-      << FixItHint::CreateInsertion(MatchedDecl->getLocation(),
-                                    MatchedDecl->getReturnType().getAsString())
+  diag(MatchedDecl->getReturnTypeSourceRange().getBegin(),
+       "replace with return type '%0'", DiagnosticIDs::Note)
+      << FixItHint::CreateReplacement(
+             MatchedDecl->getReturnTypeSourceRange(),
+             MatchedDecl->getReturnType().getAsString())
       << MatchedDecl->getReturnType().getAsString();
 }
 
