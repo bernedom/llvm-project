@@ -28,17 +28,20 @@ void AutoToExplicitReturnTypeCheck::check(
     const MatchFinder::MatchResult &Result) {
   // FIXME: Add callback implementation.
   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("x");
-  // if (!MatchedDecl->getName().startswith("operator\"\""))
-  //   return;
+
+  // Set printing policy to remove 'struct'
+  PrintingPolicy pol(getLangOpts());
+  pol.SuppressSpecifiers = 0;
+
   diag(MatchedDecl->getReturnTypeSourceRange().getBegin(),
        "function %0 returns 'auto' instead of explict return type '%1'")
-      << MatchedDecl << MatchedDecl->getReturnType().getAsString();
+      << MatchedDecl << MatchedDecl->getReturnType().getAsString(pol);
   diag(MatchedDecl->getReturnTypeSourceRange().getBegin(),
        "replace with return type '%0'", DiagnosticIDs::Note)
       << FixItHint::CreateReplacement(
              MatchedDecl->getReturnTypeSourceRange(),
-             MatchedDecl->getReturnType().getAsString())
-      << MatchedDecl->getReturnType().getAsString();
+             MatchedDecl->getReturnType().getAsString(pol))
+      << MatchedDecl->getReturnType().getAsString(pol);
 }
 
 } // namespace misc
