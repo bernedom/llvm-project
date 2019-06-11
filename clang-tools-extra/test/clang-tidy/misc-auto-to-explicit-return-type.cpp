@@ -17,8 +17,8 @@ constexpr auto operator"" _intr(long double) {
 constexpr auto operator"" _some(long double) {
   return typed_class<long double>{};
 }
-// CHECK-MESSAGES: :[[@LINE-3]]:11: warning: function 'operator""_some' returns 'auto' instead of explict return type 'base_class<int, long double>' [misc-auto-to-explicit-return-type]
-// CHECK-FIXES: constexpr base_class<int, long double> operator"" _some(long double)
+// CHECK-MESSAGES: :[[@LINE-3]]:11: warning: function 'operator""_some' returns 'auto' instead of explict return type 'typed_class<long double>' [misc-auto-to-explicit-return-type]
+// CHECK-FIXES: constexpr typed_class<long double> operator"" _some(long double)
 
 // does not trigger
 constexpr typed_class<long double> operator"" _some_more(long double) {
