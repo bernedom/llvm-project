@@ -18,6 +18,10 @@ namespace misc {
 
 void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
 
+  // only parse c++
+  if (!getLangOpts().CPlusPlus)
+    return;
+
   auto declMatcher =
       functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()));
   Finder->addMatcher(
