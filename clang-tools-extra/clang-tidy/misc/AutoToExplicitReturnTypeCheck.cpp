@@ -39,6 +39,14 @@ void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
                   .bind("func_decl")))
           .bind("temp_object"),
       this);
+
+  // Naked function decl
+  Finder->addMatcher(
+      functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()),
+                   unless(hasDescendant(cxxFunctionalCastExpr())),
+                   unless(hasDescendant(cxxTemporaryObjectExpr())))
+          .bind("func_decl"),
+      this);
 }
 
 void AutoToExplicitReturnTypeCheck::check(
