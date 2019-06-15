@@ -12,6 +12,8 @@ clang-query -extra-arg=-std=c++17 ../../clang-tools-extra/test/clang-tidy/misc-a
 
 set bind-root false	
 match functionDecl(isConstexpr()).bind("x")
+match functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType())).bind("x")
+match cxxStaticCastExpr(hasSourceExpression(functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType())))).bind("cast")
 
 unless --> not
 
