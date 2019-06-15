@@ -24,15 +24,20 @@ void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
 
   auto declMatcher =
       functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()));
+
   Finder->addMatcher(
       cxxFunctionalCastExpr(hasAncestor(declMatcher.bind("func_decl")))
           .bind("cast_expr"),
       this);
 
   Finder->addMatcher(
-      functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()),
-                   unless(hasDescendant(cxxFunctionalCastExpr())))
-          .bind("func_decl"),
+      cxxTemporaryObjectExpr(
+          hasAncestor(
+              functionDecl(isConstexpr(), unless(isImplicit()),
+                           returns(autoType()),
+                           unless(hasDescendant(cxxFunctionalCastExpr())))
+                  .bind("func_decl")))
+          .bind("temp_object"),
       this);
 }
 
@@ -41,6 +46,8 @@ void AutoToExplicitReturnTypeCheck::check(
   // FIXME: Add callback implementation.
   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("func_decl");
   const auto *cast_expr = Result.Nodes.getNodeAs<ExplicitCastExpr>("cast_expr");
+  const auto *temp_obj =
+      Result.Nodes.getNodeAs<CXXTemporaryObjectExpr>("temp_object");
 
   // Set printing policy to remove 'struct'
   PrintingPolicy pol(getLangOpts());
@@ -49,6 +56,8 @@ void AutoToExplicitReturnTypeCheck::check(
   auto return_type = MatchedDecl->getReturnType();
   if (cast_expr) {
     return_type = cast_expr->getType();
+  } else if (temp_obj) {
+    return_type = temp_obj->getType();
   }
 
   diag(MatchedDecl->getReturnTypeSourceRange().getBegin(),
