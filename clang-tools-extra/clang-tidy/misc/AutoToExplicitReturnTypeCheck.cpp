@@ -22,22 +22,12 @@ void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
   if (!getLangOpts().CPlusPlus)
     return;
 
-  auto declMatcher =
-      functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()));
-
   Finder->addMatcher(
-      cxxFunctionalCastExpr(hasAncestor(declMatcher.bind("func_decl")))
-          .bind("cast_expr"),
-      this);
-
-  Finder->addMatcher(
-      cxxTemporaryObjectExpr(
-          hasAncestor(
-              functionDecl(isConstexpr(), unless(isImplicit()),
-                           returns(autoType()),
-                           unless(hasDescendant(cxxFunctionalCastExpr())))
-                  .bind("func_decl")))
-          .bind("temp_object"),
+      functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()),
+                   hasDescendant(expr(anyOf(cxxFunctionalCastExpr(),
+                                            cxxTemporaryObjectExpr()))
+                                     .bind("expr")))
+          .bind("func_decl"),
       this);
 
   // Naked function decl
@@ -53,19 +43,15 @@ void AutoToExplicitReturnTypeCheck::check(
     const MatchFinder::MatchResult &Result) {
   // FIXME: Add callback implementation.
   const auto *MatchedDecl = Result.Nodes.getNodeAs<FunctionDecl>("func_decl");
-  const auto *cast_expr = Result.Nodes.getNodeAs<ExplicitCastExpr>("cast_expr");
-  const auto *temp_obj =
-      Result.Nodes.getNodeAs<CXXTemporaryObjectExpr>("temp_object");
+  const auto *expr = Result.Nodes.getNodeAs<Expr>("expr");
 
   // Set printing policy to remove 'struct'
   PrintingPolicy pol(getLangOpts());
   pol.SuppressSpecifiers = 0;
 
   auto return_type = MatchedDecl->getReturnType();
-  if (cast_expr) {
-    return_type = cast_expr->getType();
-  } else if (temp_obj) {
-    return_type = temp_obj->getType();
+  if (expr) {
+    return_type = expr->getType();
   }
 
   diag(MatchedDecl->getReturnTypeSourceRange().getBegin(),

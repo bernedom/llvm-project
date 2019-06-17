@@ -18,3 +18,6 @@ match cxxStaticCastExpr(hasSourceExpression(functionDecl(isConstexpr(), unless(i
 unless --> not
 
 https://devblogs.microsoft.com/cppblog/exploring-clang-tooling-part-2-examining-the-clang-ast-with-clang-query/
+
+
+~/Code/llvm-project/llvm/build/bin/clang-tidy -extra-arg=-std=c++17 --header-filter=.* --checks="-*,misc-auto-to-explicit-return-type" ./main.cc -- --std=c++17
