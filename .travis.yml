@@ -1,0 +1,36 @@
+language: cpp
+dist: xenial
+compiler: clang
+
+common-sources: &all_sources
+  - ubuntu-toolchain-r-test
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - cmake
+
+- os: linux
+  compiler: gcc
+  addons:
+    apt:
+      sources: *all_sources
+      packages:
+        - g++-8
+        - binutils-gold
+  env:
+    - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"        
+   
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+
+script: 
+  - cmake --version
+  - mkdir llvm/build && cd llvm/build
+  - cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_LINKER=gold -DLLVM_ENABLE_PROJECTS="clang-tools-extra" -DLLVM_PARALLEL_LINK_JOBS=1 ..
+  - cmake --build . --config Release --target LLVMCore -- -j $(nproc)
+  - cmake --build . --config Release --target LTO -- -j $(nproc)
+  - cmake --build . --config Release -- -j $(nproc)
