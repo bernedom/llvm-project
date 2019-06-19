@@ -27,4 +27,9 @@ constexpr typed_class<long double> operator"" _some_more(long double x) {
   return typed_class<long double>{x};
 };
 
+template <typename T>
+constexpr auto _dependend_func(T x) {
+  return typed_class<T>{x};
+}
+
 void any_f(){};
