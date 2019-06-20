@@ -23,7 +23,7 @@ void AutoToExplicitReturnTypeCheck::registerMatchers(MatchFinder *Finder) {
     return;
 
   Finder->addMatcher(
-      functionDecl(isConstexpr(), unless(isImplicit()), returns(autoType()),
+      functionDecl(unless(isImplicit()), returns(autoType()),
                    hasDescendant(returnStmt().bind("return_stmt")))
           .bind("func_decl"),
       this);
