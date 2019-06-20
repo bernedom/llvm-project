@@ -1,27 +1,17 @@
 language: cpp
 dist: xenial
-compiler: clang
-
-common-sources: &all_sources
-  - ubuntu-toolchain-r-test
-
+os: linux
+compiler: gcc
 addons:
   apt:
-    sources:
+    sources: 
       - ubuntu-toolchain-r-test
     packages:
-      - cmake
-
-- os: linux
-  compiler: gcc
-  addons:
-    apt:
-      sources: *all_sources
-      packages:
-        - g++-8
-        - binutils-gold
-  env:
-    - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"        
+      - cmake 
+      - g++-8
+      - binutils-gold
+env:
+  - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"        
    
 
 before_install:
