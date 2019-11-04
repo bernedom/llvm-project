@@ -1,0 +1,16 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: dependencies
+        run: sudo apt install binutils-gold -y
+      - name: cmake
+        run: cd llvm && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_LINKER=gold -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra" -DLLVM_PARALLEL_LINK_JOBS=1 ..
+      - name: build
+        run: cmake --build ./llvm/build --target check-clang-tools -- -j $(nproc)
